@@ -76,19 +76,33 @@ def load_class_names():
     return DEFAULT_CLASSES
 
 
+def _mtime(fname):
+    """Waktu modifikasi file (0 jika tidak ada) -> dipakai agar cache ikut berubah saat file berubah."""
+    p = os.path.join(OUT_DIR, fname)
+    return os.path.getmtime(p) if os.path.exists(p) else 0
+
+
 @st.cache_data
-def load_split(name):
+def _load_split(name, mtime):
     p = os.path.join(OUT_DIR, f"{name}.csv")
     return pd.read_csv(p) if os.path.exists(p) else None
 
 
+def load_split(name):
+    return _load_split(name, _mtime(f"{name}.csv"))
+
+
 @st.cache_data
-def load_history():
+def _load_history(mtime):
     p = os.path.join(OUT_DIR, "history.json")
     if os.path.exists(p):
         with open(p, "r", encoding="utf-8") as f:
             return pd.DataFrame(json.load(f))
     return None
+
+
+def load_history():
+    return _load_history(_mtime("history.json"))
 
 
 def resolve_path(row, base_dir):
@@ -114,7 +128,7 @@ def predict_one(model, img):
 
 
 @st.cache_data(show_spinner="Mengevaluasi model pada data uji...")
-def evaluate_test(base_dir, n_classes):
+def evaluate_test(base_dir, n_classes, eval_mtime=0):
     # Prioritas 1: hasil evaluasi yang sudah dihitung di notebook (tanpa perlu gambar)
     ep = os.path.join(OUT_DIR, "eval_results.json")
     if os.path.exists(ep):
@@ -387,7 +401,7 @@ else:
 # 4-5. EVALUASI
 # ==========================================
 st.header("4. Evaluasi Model pada Data Uji")
-ev = evaluate_test(base_dir, n_cls) if te_df is not None else None
+ev = evaluate_test(base_dir, n_cls, _mtime("eval_results.json")) if te_df is not None else None
 if ev is None or ev.get("n", 0) == 0:
     st.warning("Evaluasi belum tersedia: `eval_results.json` tidak ditemukan dan gambar data uji "
                "tidak bisa dibaca. Jalankan sel penyimpanan evaluasi di notebook, lalu upload "
