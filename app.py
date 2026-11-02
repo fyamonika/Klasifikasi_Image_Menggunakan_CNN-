@@ -44,7 +44,10 @@ DEFAULT_CLASSES = [
     "Crustaceans", "Seaweed", "Sponges", "Other marine organisms",
 ]
 
-tf.config.set_visible_devices([], "GPU")
+try:
+    tf.config.set_visible_devices([], "GPU")
+except RuntimeError:
+    pass  # sudah terinisialisasi pada rerun Streamlit; aman diabaikan
 st.set_page_config(page_title="OceanicLife CNN Dashboard", page_icon="🌊", layout="wide")
 
 
