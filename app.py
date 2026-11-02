@@ -30,7 +30,12 @@ from sklearn.metrics import (
 # ==========================================
 # KONFIGURASI
 # ==========================================
-OUT_DIR = "output_oceaniclife"
+_BASE = os.path.dirname(os.path.abspath(__file__))
+OUT_DIR = (
+    os.path.join(_BASE, "output_oceaniclife")
+    if os.path.isdir(os.path.join(_BASE, "output_oceaniclife"))
+    else _BASE
+)
 IMG_SIZE = (160, 160)
 DEFAULT_BASE_DIR = (
     r"C:\Users\User\OneDrive\Documents\Klasifikasi Image Menggunakan CNN\OceanicLife Dataset"
