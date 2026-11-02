@@ -115,6 +115,18 @@ def predict_one(model, img):
 
 @st.cache_data(show_spinner="Mengevaluasi model pada data uji...")
 def evaluate_test(base_dir, n_classes):
+    # Prioritas 1: hasil evaluasi yang sudah dihitung di notebook (tanpa perlu gambar)
+    ep = os.path.join(OUT_DIR, "eval_results.json")
+    if os.path.exists(ep):
+        with open(ep, "r", encoding="utf-8") as f:
+            d = json.load(f)
+        return {
+            "y_true": np.array(d["y_true"]),
+            "y_pred": np.array(d["y_pred"]),
+            "missing": 0,
+            "n": len(d["y_true"]),
+        }
+    # Prioritas 2: hitung ulang dari gambar data uji
     model, _ = load_model()
     te = load_split("test")
     if model is None or te is None:
@@ -377,8 +389,9 @@ else:
 st.header("4. Evaluasi Model pada Data Uji")
 ev = evaluate_test(base_dir, n_cls) if te_df is not None else None
 if ev is None or ev.get("n", 0) == 0:
-    st.warning("Evaluasi belum bisa dihitung: gambar data uji tidak ditemukan. "
-               "Periksa kolom 'Folder dataset gambar' di sidebar.")
+    st.warning("Evaluasi belum tersedia: `eval_results.json` tidak ditemukan dan gambar data uji "
+               "tidak bisa dibaca. Jalankan sel penyimpanan evaluasi di notebook, lalu upload "
+               "`eval_results.json` ke repo.")
 else:
     if ev["missing"]:
         st.caption(f"⚠️ {ev['missing']} gambar uji tidak ditemukan/rusak dan dilewati.")
