@@ -346,7 +346,7 @@ else:
         pth = os.path.join(OUT_DIR, fname)
         if os.path.exists(pth):
             with st.expander(title):
-                st.image(pth, use_container_width=True)
+                st.image(pth, width="stretch")
                 show_analysis(cap)
 
 # ==========================================
@@ -417,7 +417,7 @@ else:
     p, r, f, s = precision_recall_fscore_support(y_true, y_pred, labels=labels, zero_division=0)
     rep = pd.DataFrame({"Kelas": class_names, "Precision": p, "Recall": r, "F1-score": f, "Support": s})
     st.dataframe(rep.style.format({"Precision": "{:.3f}", "Recall": "{:.3f}", "F1-score": "{:.3f}"}),
-                 use_container_width=True, hide_index=True)
+                 width="stretch", hide_index=True)
 
     fig, ax = plt.subplots(figsize=(10, 3.8))
     x = np.arange(n_cls); w = 0.27
@@ -450,7 +450,7 @@ if file is not None:
 
     c1, c2 = st.columns(2)
     with c1:
-        st.image(image, caption="Gambar input", use_container_width=True)
+        st.image(image, caption="Gambar input", width="stretch")
     with c2:
         st.subheader("Hasil Prediksi")
         st.metric("Kelas terdeteksi", class_names[top])
